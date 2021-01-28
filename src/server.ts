@@ -1,21 +1,20 @@
 import { Controller, Get, Module, Param } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { RMQService } from "nestjs-rmq";
+import { initRMQModule } from "./microservices-config";
 
 @Controller()
 class ServerController {
-  private readonly client: ClientProxy;
-
-  constructor() {
-    this.client = ClientProxyFactory.create(microservicesConfig);
-  }
+  constructor(private readonly client: RMQService) {}
 
   @Get("/")
   public async index() {
-    const reversedAndUppserCased = await this.client
-      .send<string>("reverse-and-uppercase", `ehhe-${Date.now()}`)
-      .toPromise();
+    console.log("Hit index route...");
+    const reversedAndUppserCased = await this.client.send<string, string>(
+      "reverse-and-uppercase",
+      `ehhe-${Date.now()}`
+    );
+    console.log("Sending index route...");
 
     return {
       serverPid: process.pid,
@@ -26,9 +25,9 @@ class ServerController {
 
   @Get("/test/:name")
   public async amIBanana(@Param("name") name: string) {
-    const result = await this.client
-      .send<boolean>("am-i-banana", name)
-      .toPromise();
+    console.log("Hit am I banan route...");
+    const result = await this.client.send<string, boolean>("am-i-banana", name);
+    console.log("Sending am I banana response...");
 
     return {
       serverPid: process.pid,
@@ -39,6 +38,7 @@ class ServerController {
 }
 
 @Module({
+  imports: [initRMQModule()],
   controllers: [ServerController],
 })
 class ServerModule {}

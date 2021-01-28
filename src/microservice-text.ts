@@ -1,7 +1,7 @@
 import { Controller, Injectable, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { MessagePattern } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { RMQRoute } from "nestjs-rmq";
+import { initRMQModule } from "./microservices-config";
 
 @Injectable()
 class TextMicroserviceService {
@@ -22,26 +22,23 @@ class TextMicroserviceService {
 class TextMicroserviceController {
   constructor(private readonly testService: TextMicroserviceService) {}
 
-  @MessagePattern("reverse-and-uppercase")
+  @RMQRoute("reverse-and-uppercase")
   async reverseAndUppercase(text: string): Promise<string> {
     return await this.testService.reverseAndUppercase(text);
   }
 }
 
 @Module({
-  imports: [],
+  imports: [initRMQModule()],
   controllers: [TextMicroserviceController],
   providers: [TextMicroserviceService],
 })
 class TextMicroserviceModule {}
 
 async function bootstrap() {
-  const microserviceApp = await NestFactory.createMicroservice(
-    TextMicroserviceModule,
-    microservicesConfig
-  );
+  const microserviceApp = await NestFactory.create(TextMicroserviceModule);
 
-  await microserviceApp.listenAsync();
+  await microserviceApp.listenAsync(4445);
   console.log(`Text microservice is listening process(pid: ${process.pid})!`);
 }
 

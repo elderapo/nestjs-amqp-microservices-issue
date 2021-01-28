@@ -1,7 +1,7 @@
 import { Controller, Injectable, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { MessagePattern } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { RMQRoute } from "nestjs-rmq";
+import { initRMQModule } from "./microservices-config";
 
 @Injectable()
 class BananaMicroserviceService {
@@ -15,26 +15,23 @@ class BananaMicroserviceService {
 class BananaMicroserviceController {
   constructor(private readonly bananaService: BananaMicroserviceService) {}
 
-  @MessagePattern("am-i-banana")
+  @RMQRoute("am-i-banana")
   async amIBanana(name: string): Promise<boolean> {
     return await this.bananaService.amIBanana(name);
   }
 }
 
 @Module({
-  imports: [],
+  imports: [initRMQModule()],
   controllers: [BananaMicroserviceController],
   providers: [BananaMicroserviceService],
 })
 class BananaMicroserviceModule {}
 
 async function bootstrap() {
-  const microserviceApp = await NestFactory.createMicroservice(
-    BananaMicroserviceModule,
-    microservicesConfig
-  );
+  const microserviceApp = await NestFactory.create(BananaMicroserviceModule);
 
-  await microserviceApp.listenAsync();
+  await microserviceApp.listenAsync(4446);
   console.log(`Banana microservice is listening process(pid: ${process.pid})!`);
 }
 
