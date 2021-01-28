@@ -1,0 +1,30 @@
+{
+  "name": "nestjs-amqp-microservices-issue",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "start:server": "ts-node-dev --transpile-only --respawn --no-notify ./src/server.ts",
+    "start:banana-microservice": "ts-node-dev --transpile-only --respawn --no-notify ./src/microservice-banana.ts",
+    "start:text-microservice": "ts-node-dev --transpile-only --respawn --no-notify ./src/microservice-text.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^6.7.2",
+    "@nestjs/core": "^6.7.2",
+    "@nestjs/microservices": "^6.10.14",
+    "@nestjs/platform-express": "^6.7.2",
+    "amqp-connection-manager": "^3.2.1",
+    "amqplib": "^0.6.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.5.3"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.1.1",
+    "@types/express": "^4.17.1",
+    "@types/node": "^12.7.5",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "typescript": "^3.6.3"
+  }
+}
