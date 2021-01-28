@@ -12,3 +12,5 @@ yarn start:server
 yarn start:banana-microservice
 yarn start:text-microservice
 ```
+
+And visit `http://localhost:4444/` & `http://localhost:4444/test/Tomek` few times in different order.
