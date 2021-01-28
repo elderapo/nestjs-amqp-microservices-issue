@@ -1,19 +1,25 @@
 import { Controller, Get, Module, Param } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import {
+  microserviceBananaConfig,
+  microserviceTextConfig,
+} from "./microservices-config";
 
 @Controller()
 class ServerController {
-  private readonly client: ClientProxy;
+  private readonly textClient: ClientProxy = ClientProxyFactory.create(
+    microserviceTextConfig
+  );
+  private readonly bananaClient: ClientProxy = ClientProxyFactory.create(
+    microserviceBananaConfig
+  );
 
-  constructor() {
-    this.client = ClientProxyFactory.create(microservicesConfig);
-  }
+  constructor() {}
 
   @Get("/")
   public async index() {
-    const reversedAndUppserCased = await this.client
+    const reversedAndUppserCased = await this.textClient
       .send<string>("reverse-and-uppercase", `ehhe-${Date.now()}`)
       .toPromise();
 
@@ -26,7 +32,7 @@ class ServerController {
 
   @Get("/test/:name")
   public async amIBanana(@Param("name") name: string) {
-    const result = await this.client
+    const result = await this.bananaClient
       .send<boolean>("am-i-banana", name)
       .toPromise();
 

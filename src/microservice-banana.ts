@@ -1,7 +1,7 @@
 import { Controller, Injectable, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MessagePattern } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { microserviceBananaConfig } from "./microservices-config";
 
 @Injectable()
 class BananaMicroserviceService {
@@ -31,7 +31,7 @@ class BananaMicroserviceModule {}
 async function bootstrap() {
   const microserviceApp = await NestFactory.createMicroservice(
     BananaMicroserviceModule,
-    microservicesConfig
+    microserviceBananaConfig
   );
 
   await microserviceApp.listenAsync();
