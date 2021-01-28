@@ -1,12 +1,6 @@
 version: "3.4"
 
 services:
-  redis:
-    image: bitnami/redis:latest
-    environment:
-      REDIS_PASSWORD: redis-pass
-    ports:
-      - 6666:6379
   rabbitmq:
     image: bitnami/rabbitmq:latest
     ports:
