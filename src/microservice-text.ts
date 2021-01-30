@@ -10,6 +10,7 @@ class TextMicroserviceService {
   @RabbitRPC({
     exchange: "my-exchange",
     routingKey: "reverse-and-uppercase",
+    queue: "my-q",
   })
   public async reverseAndUppercase(text: string): Promise<string> {
     console.log(`Reversing and uppercasing text: ${text}...`);

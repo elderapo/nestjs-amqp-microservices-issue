@@ -8,6 +8,7 @@ class BananaMicroserviceService {
   @RabbitRPC({
     exchange: "my-exchange",
     routingKey: "am-i-banana",
+    queue: "my-q",
   })
   public async amIBanana(name: string): Promise<boolean> {
     console.log(`Checking if "${name}" is a banana...`);
