@@ -1,14 +1,9 @@
-import { ClientOptions, Transport } from "@nestjs/microservices";
+import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 
-export const microservicesConfig: ClientOptions = {
-  transport: Transport.RMQ,
-  options: {
-    urls: ["amqp://user:bitnami@127.0.0.1:5672"],
-
-    queue: "my-app-queue",
-
-    queueOptions: {
-      durable: true,
+export const createRabitMQModuleWithConfig = () =>
+  RabbitMQModule.forRoot(RabbitMQModule, {
+    uri: "amqp://user:bitnami@127.0.0.1:5672",
+    connectionInitOptions: {
+      wait: false,
     },
-  },
-};
+  });

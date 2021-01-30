@@ -1,37 +1,29 @@
-import { Controller, Injectable, Module } from "@nestjs/common";
+import { RabbitRPC } from "@golevelup/nestjs-rabbitmq";
+import { Injectable, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { MessagePattern } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { createRabitMQModuleWithConfig } from "./microservices-config";
 
 @Injectable()
 class BananaMicroserviceService {
+  @RabbitRPC({
+    exchange: "my-exchange",
+    routingKey: "am-i-banana",
+  })
   public async amIBanana(name: string): Promise<boolean> {
     console.log(`Checking if "${name}" is a banana...`);
     return name.toLowerCase() === "banana";
   }
 }
 
-@Controller()
-class BananaMicroserviceController {
-  constructor(private readonly bananaService: BananaMicroserviceService) {}
-
-  @MessagePattern("am-i-banana")
-  async amIBanana(name: string): Promise<boolean> {
-    return await this.bananaService.amIBanana(name);
-  }
-}
-
 @Module({
-  imports: [],
-  controllers: [BananaMicroserviceController],
+  imports: [createRabitMQModuleWithConfig()],
   providers: [BananaMicroserviceService],
 })
 class BananaMicroserviceModule {}
 
 async function bootstrap() {
   const microserviceApp = await NestFactory.createMicroservice(
-    BananaMicroserviceModule,
-    microservicesConfig
+    BananaMicroserviceModule
   );
 
   await microserviceApp.listenAsync();

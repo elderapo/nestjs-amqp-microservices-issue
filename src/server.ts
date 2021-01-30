@@ -1,21 +1,19 @@
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 import { Controller, Get, Module, Param } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { createRabitMQModuleWithConfig } from "./microservices-config";
 
 @Controller()
 class ServerController {
-  private readonly client: ClientProxy;
-
-  constructor() {
-    this.client = ClientProxyFactory.create(microservicesConfig);
-  }
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   @Get("/")
   public async index() {
-    const reversedAndUppserCased = await this.client
-      .send<string>("reverse-and-uppercase", `ehhe-${Date.now()}`)
-      .toPromise();
+    const reversedAndUppserCased = await this.amqpConnection.request<string>({
+      exchange: "my-exchange",
+      routingKey: "reverse-and-uppercase",
+      payload: `ehhe-${Date.now()}`,
+    });
 
     return {
       serverPid: process.pid,
@@ -26,9 +24,11 @@ class ServerController {
 
   @Get("/test/:name")
   public async amIBanana(@Param("name") name: string) {
-    const result = await this.client
-      .send<boolean>("am-i-banana", name)
-      .toPromise();
+    const result = await this.amqpConnection.request<boolean>({
+      exchange: "my-exchange",
+      routingKey: "am-i-banana",
+      payload: name,
+    });
 
     return {
       serverPid: process.pid,
@@ -39,6 +39,7 @@ class ServerController {
 }
 
 @Module({
+  imports: [createRabitMQModuleWithConfig()],
   controllers: [ServerController],
 })
 class ServerModule {}

@@ -1,12 +1,16 @@
-import { Controller, Injectable, Module } from "@nestjs/common";
+import { RabbitRPC } from "@golevelup/nestjs-rabbitmq";
+import { Injectable, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { MessagePattern } from "@nestjs/microservices";
-import { microservicesConfig } from "./microservices-config";
+import { createRabitMQModuleWithConfig } from "./microservices-config";
 
 @Injectable()
 class TextMicroserviceService {
   public constructor() {}
 
+  @RabbitRPC({
+    exchange: "my-exchange",
+    routingKey: "reverse-and-uppercase",
+  })
   public async reverseAndUppercase(text: string): Promise<string> {
     console.log(`Reversing and uppercasing text: ${text}...`);
 
@@ -18,27 +22,15 @@ class TextMicroserviceService {
   }
 }
 
-@Controller()
-class TextMicroserviceController {
-  constructor(private readonly testService: TextMicroserviceService) {}
-
-  @MessagePattern("reverse-and-uppercase")
-  async reverseAndUppercase(text: string): Promise<string> {
-    return await this.testService.reverseAndUppercase(text);
-  }
-}
-
 @Module({
-  imports: [],
-  controllers: [TextMicroserviceController],
+  imports: [createRabitMQModuleWithConfig()],
   providers: [TextMicroserviceService],
 })
 class TextMicroserviceModule {}
 
 async function bootstrap() {
   const microserviceApp = await NestFactory.createMicroservice(
-    TextMicroserviceModule,
-    microservicesConfig
+    TextMicroserviceModule
   );
 
   await microserviceApp.listenAsync();
