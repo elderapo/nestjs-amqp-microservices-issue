@@ -22,11 +22,11 @@ class BananaMicroserviceService {
 class BananaMicroserviceModule {}
 
 async function bootstrap() {
-  const microserviceApp = await NestFactory.createMicroservice(
+  const microserviceApp = await NestFactory.createApplicationContext(
     BananaMicroserviceModule
   );
 
-  await microserviceApp.listenAsync();
+  await microserviceApp.init();
   console.log(`Banana microservice is listening process(pid: ${process.pid})!`);
 }
 

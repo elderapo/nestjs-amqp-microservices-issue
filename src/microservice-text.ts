@@ -14,11 +14,13 @@ class TextMicroserviceService {
   public async reverseAndUppercase(text: string): Promise<string> {
     console.log(`Reversing and uppercasing text: ${text}...`);
 
-    return text
-      .toUpperCase()
-      .split("")
-      .reverse()
-      .join("");
+    return (
+      text
+        .toUpperCase()
+        .split("")
+        .reverse()
+        .join("") + ` my pid is: ${process.pid}`
+    );
   }
 }
 
@@ -29,11 +31,11 @@ class TextMicroserviceService {
 class TextMicroserviceModule {}
 
 async function bootstrap() {
-  const microserviceApp = await NestFactory.createMicroservice(
+  const microserviceApp = await NestFactory.createApplicationContext(
     TextMicroserviceModule
   );
 
-  await microserviceApp.listenAsync();
+  await microserviceApp.init();
   console.log(`Text microservice is listening process(pid: ${process.pid})!`);
 }
 
